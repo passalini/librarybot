@@ -17,47 +17,29 @@ describe 'Site da biblioteca' do
 
 end
 
-describe 'Bot' do
-  cont = 0  #Arrumar um jeito melhor pra isso (21..31), por enquanto não descobri como...
-  gambiarra = :foo
-  livro = 'Livro'
-
-  before do
-    cont = cont + 1
-    if cont < 2
-      @bot = Bot.new
-    else
-      @bot = gambiarra
-    end
-  end
-
-  after do
-    gambiarra = @bot
-  end
+describe Aluno do
 
   context 'preencher campos' do
-    it "ao fornecer senha e matricula (validas), deve estar na pagina de emprestimo" do
-      matricula = 'sua matricula'
-      senha = 'sua senha'
-      @bot.preencher(matricula, senha)
-      @bot.session.should have_content 'Nova Consulta'
+    it "ao fornecer senha e matricula (validas), deve estar na pagina de emprestimo e obter dados dos livros" do
+      aluno = Aluno.new('matricula', 'senha')
+      aluno.visitar('http://www.bibliotecas.uenf.br/informa/cgi-bin/biblio.dll/emprest?g=geral&bd=&p=GERAL')
+      aluno.logar
+      aluno.livros_em_emprestimo.first.codigo.should == "codigo_do_primeiro_livro"
+      aluno.livros_em_emprestimo.last.link_para_renovar.should == "link_para_renovar_ultino_livro"
+      aluno.session.should have_content 'Nova Consulta'
     end
   end
 
-  context 'na pagina de emprestimo' do
-    it "deve conter o livro fonecido" do
-      @bot.session.should have_content livro
-    end
-
-    it "deveria conter um link para renovar o livro" do
-      @bot.contem_livro?(livro).should == true
-    end
-  end
 
   context "Renovação" do
-    it "deveria retornar o status do livro pedido" do
-      @bot.renovar(livro).should == ('Renovado' or "Publicação não renovada")
+    it "deve renovar o primeiro livro" do
+      aluno = Aluno.new('matricula', 'senha')
+      aluno.visitar('http://www.bibliotecas.uenf.br/informa/cgi-bin/biblio.dll/emprest?g=geral&bd=&p=GERAL')
+      aluno.logar
+      aluno.renovar(aluno.livros_em_emprestimo.first)
+      aluno.session.should have_content "Publicação Renovada"
     end
   end
 
 end
+
