@@ -20,12 +20,12 @@ end
 describe Aluno do
   before  do
     @aluno = Aluno.new('2278', '987654321')
+    @aluno.visitar
+    @aluno.logar
   end
 
   context 'preencher campos' do
     it "ao fornecer senha e matricula (validas), deve estar na pagina de emprestimo" do
-      @aluno.visitar
-      @aluno.logar
       @aluno.session.should have_content 'Nova Consulta'
     end
   end
@@ -33,15 +33,11 @@ describe Aluno do
   context "Renovação" do
 
     it 'deve conter uma lista de livros' do
-      @aluno.visitar
-      @aluno.logar
       @aluno.obter_livros_em_emprestimo
       @aluno.livros_em_emprestimo.length.should_not == 0
     end
 
     it "deve renovar o livro pedido, pelo nome do livro" do
-      @aluno.visitar
-      @aluno.logar
       @aluno.obter_livros_em_emprestimo
       @aluno.renovar('Dominando Ajax')
       @aluno.session.should have_content "Publicação Renovada"
