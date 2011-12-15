@@ -19,7 +19,7 @@ end
 
 describe Aluno do
   before  do
-    @aluno = Aluno.new('2278', '987654321')
+    @aluno = Aluno.new('Matricula', 'Senha')
     @aluno.visitar
     @aluno.logar
   end
@@ -39,7 +39,7 @@ describe Aluno do
 
     it "deve renovar o livro pedido, pelo nome do livro" do
       @aluno.obter_livros_em_emprestimo
-      @aluno.renovar('Dominando Ajax')
+      @aluno.renovar('Nome do livro')
       @aluno.session.should have_content "Publicação Renovada"
     end
   end
