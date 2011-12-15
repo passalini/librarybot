@@ -18,28 +18,34 @@ describe 'Site da biblioteca' do
 end
 
 describe Aluno do
+  before  do
+    @aluno = Aluno.new('2278', '987654321')
+  end
 
   context 'preencher campos' do
-    it "ao fornecer senha e matricula (validas), deve estar na pagina de emprestimo e obter dados dos livros" do
-      aluno = Aluno.new('matricula', 'senha')
-      aluno.visitar('http://www.bibliotecas.uenf.br/informa/cgi-bin/biblio.dll/emprest?g=geral&bd=&p=GERAL')
-      aluno.logar
-      aluno.livros_em_emprestimo.first.codigo.should == "codigo_do_primeiro_livro"
-      aluno.livros_em_emprestimo.last.link_para_renovar.should == "link_para_renovar_ultino_livro"
-      aluno.session.should have_content 'Nova Consulta'
+    it "ao fornecer senha e matricula (validas), deve estar na pagina de emprestimo" do
+      @aluno.visitar
+      @aluno.logar
+      @aluno.session.should have_content 'Nova Consulta'
     end
   end
 
-
   context "Renovação" do
-    it "deve renovar o primeiro livro" do
-      aluno = Aluno.new('matricula', 'senha')
-      aluno.visitar('http://www.bibliotecas.uenf.br/informa/cgi-bin/biblio.dll/emprest?g=geral&bd=&p=GERAL')
-      aluno.logar
-      aluno.renovar(aluno.livros_em_emprestimo.first)
-      aluno.session.should have_content "Publicação Renovada"
+
+    it 'deve conter uma lista de livros' do
+      @aluno.visitar
+      @aluno.logar
+      @aluno.obter_livros_em_emprestimo
+      @aluno.livros_em_emprestimo.length.should_not == 0
+    end
+
+    it "deve renovar o livro pedido, pelo nome do livro" do
+      @aluno.visitar
+      @aluno.logar
+      @aluno.obter_livros_em_emprestimo
+      @aluno.renovar('Dominando Ajax')
+      @aluno.session.should have_content "Publicação Renovada"
     end
   end
 
 end
-
